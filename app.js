@@ -14,7 +14,7 @@ const User = require('./models/user');
 const csrtProtection = csrf();
 
 const MONGODB_URI =
-'mongodb+srv://Arjun:arjun31@cluster0-ptp5p.mongodb.net/shop?retryWrites=true&w=majority';
+'mongodb+srv://Arjun:********@cluster0-ptp5p.mongodb.net/shop?retryWrites=true&w=majority';
 
 
 
