@@ -10,6 +10,11 @@
   margin-bottom: 0.25rem;
 }
 
+.form-control input.invalid,
+.form-control textarea.invalid {
+  border-color: red;
+}
+
 .form-control input,
 .form-control textarea {
   border: 1px solid #a1a1a1;

@@ -214,6 +214,10 @@ form {
   border-radius: 3px;
   cursor: pointer;
 }
+.btn-reset {
+  text-decoration: none;
+  color: white;
+}
 
 .btn:hover,
 .btn:active {

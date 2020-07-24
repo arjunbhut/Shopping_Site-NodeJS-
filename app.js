@@ -1,5 +1,5 @@
 const path = require('path');
-
+const mul = require('multer');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -7,6 +7,8 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
+
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -14,7 +16,7 @@ const User = require('./models/user');
 const csrtProtection = csrf();
 
 const MONGODB_URI =
-'mongodb+srv://Arjun:********@cluster0-ptp5p.mongodb.net/shop?retryWrites=true&w=majority';
+'mongodb+srv://Arjun:arjun31@cluster0-ptp5p.mongodb.net/shop?retryWrites=true&w=majority';
 
 
 
@@ -32,6 +34,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(mul({dest: 'images'}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   session({
@@ -47,29 +50,44 @@ app.use(csrtProtection);
 app.use(flash());
 
 app.use((req,res,next) =>{
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
+app.use((req,res,next) =>{
   if(!req.session.user) {
     return next();
   }
   User.findById(req.session.user)
       .then(user =>{
+
+        if(!user)
+        {
+          return next();
+        }
+
         req.user = user;
         next();
       })
       .catch(err => console.log(err));
 });
 
-app.use((req,res,next) =>{
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
-  next();
-});
+
 
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.use(errorController.get404);
+app.use((error,req,res,next) =>{
+  res.render('500',{
+    pageTitle: 'Error Occured',
+    path: '/50'
+  })
+})
+
+
 
 mongoose
   .connect(MONGODB_URI)
