@@ -26,6 +26,34 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
+const fileFilter = (req,file,cb) =>{
+
+  if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype=='image/jpeg')
+  {
+    cb(null,true);
+  }
+ 
+  cb(null,false);
+  
+
+}
+
+const fileStorage = multer.diskStorage({
+
+  destination: (req, file, cb) => {
+    
+    cb(null,'images');
+
+  } ,
+
+  filename: (req, file, cb) =>{
+
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+
+  }
+
+});
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -34,8 +62,9 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(mul({dest: 'images'}).single('image'));
+app.use(mul({storage:fileStorage, fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images',express.static(path.join(__dirname, 'images')));
 app.use(
   session({
     secret: 'my secret',
